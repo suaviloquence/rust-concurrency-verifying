@@ -379,8 +379,9 @@ impl<T: ?Sized> Deref for Arc<T> {
     }
 }
 
-// TODO: unsafe #[may_dangle] T
-impl<T: ?Sized> Drop for Arc<T> {
+// This is originaly `unsafe impl <#[may_dangle] T> Drop for Arc<T>,
+// but Verus does not have support for drop yet, so we have to call it explicitly.
+impl<T: ?Sized> Arc<T> {
     /// Drops the `Arc`.
     ///
     /// This will decrement the strong reference count. If the strong reference
@@ -407,7 +408,7 @@ impl<T: ?Sized> Drop for Arc<T> {
     /// drop(foo2);   // Prints "dropped!"
     /// ```
     #[inline]
-    fn drop(&mut self) {
+    pub fn drop(&mut self) {
         // Because `fetch_sub` is already atomic, we do not need to synchronize
         // with other threads unless we are going to delete the object. This
         // same logic applies to the below `fetch_sub` to the `weak` count.
@@ -630,9 +631,10 @@ impl<T> Default for Weak<T> {
     }
 }
 
-// TODO: unsafe #[may_dangle] T
-impl<T: ?Sized> Drop for Weak<T> {
-    fn drop(&mut self) {
+// This is originally `unsafe impl <#[may_dangle] T> Drop for Weak<T>`, but
+// Verus does not support implicit destructors yet.
+impl<T: ?Sized> Weak<T> {
+    pub fn drop(&mut self) {
         // If we find out that we were the last weak pointer, then its time to
         // deallocate the data entirely. See the discussion in Arc::drop() about
         // the memory orderings

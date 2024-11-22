@@ -1,5 +1,8 @@
 # rust-concurrency-verifying
 
+*If you stumbled upon this repository, it is currently a work in progress.  It's
+for a final project due in December.*
+
 ## installation
 
 1. Clone the repository with submodules
